@@ -433,13 +433,21 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
             cornersUnreached.append(corner)
 
     while len(cornersUnreached) > 0:  # todo if there are still unreached corners
-        hcost, corner = min({(util.manhattanDistance(current, corner), corner) for corner in cornersUnreached})
-        #     todo remove reached corner
-        cornersUnreached.remove(corner)
-        current = corner
-        cost += hcost
+        nextCorner = cornersUnreached[0]
+        hcorner = util.manhattanDistance(current, nextCorner)
 
-    return 0
+        for corner in cornersUnreached:
+            distance = util.manhattanDistance(current, corner)
+            if distance < hcorner:
+                hcorner = distance
+                nextCorner = corner
+
+        #     todo remove reached corner
+        cornersUnreached.remove(nextCorner)
+        current = nextCorner
+        cost += hcorner
+
+    return cost
 
 
 class AStarCornersAgent(SearchAgent):
