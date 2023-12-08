@@ -296,14 +296,33 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        # TODO return the start position and empty corner list
+        return (self.startingPosition, [])
         util.raiseNotDefined()
+
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        # TODO set a unreached corner list containing the tuples from the states second element
+        cornersReached = state[1]
+        node = state[0]
+        notGoalState = False #TODO assume that the goal state is not true
+
+        # TODO check if node is in corners
+        if node in self.corners:
+            if not node in cornersReached:
+                #TODO check if node is a reached corner, if not add it to visited
+                cornersReached.append(node)
+            return len(cornersReached) == 4 #TODO return the is goal state
+        else:
+            return False
         util.raiseNotDefined()
+
+
+
 
     def getSuccessors(self, state: Any):
         """
@@ -327,7 +346,47 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
 
-        self._expanded += 1 # DO NOT CHANGE
+        # Pentru a primi nota maximă trebuie să definiți
+            # o reprezentare abstractă a stărilor care să nu includă informație ne-relevantă
+            # (precum poziția strigoilor sau a punctelor de mâncare suplimentare – care nu ne interesează).
+            # Nu folosiți GameState pentru a reprezenta o stare de căutare,
+            # pentru că va face codul să ruleze foarte încet și incorect.
+            # De exemplu, puteți scrie o funcție care să returneze o structura de date
+            # care să reprezinte o stare a problemei de căutare. Din implementarea
+            # existentă a stării jocului aveți nevoie să obțineți doar poziția
+            # de start a lui Pacman și localizarea celor 4 colțuri. De asemenea,
+            # când scrieți implementarea pentru getSuccesors puteți adăuga copii
+            # la lista de succesori si aceștia să aibă cost 1.
+
+            #     TODO GIVEN:  4 actions, successors list
+            #     TODO get the state of the pacman
+            x, y = state[0]
+
+            # TODO define pacman action - convert it to a mathematical terminology
+            dX, dY = Actions.directionToVector(action)
+
+            # Todo set the next coordinates
+            corX, corY = int(x + dX), int(y + dY)
+
+            # TODO change tuple to list to make it changeable
+            corners = list(state[1])
+
+            hitsWall = self.walls[corX][corY]
+
+            #     TODO check for wall
+            if not hitsWall:
+                # TODO create next node
+                nextNode = (corX, corY)
+
+                #         TODO check if next node is corner
+                if nextNode in self.corners and nextNode not in state[1]:
+                    #             todo  if next node is not a visited corner append it
+                    if nextNode in corners:
+                        corners.append(nextNode)
+                #         TOdo update successors
+                successors.append(((nextNode, corners), action, 1))
+
+        self._expanded += 1  # DO NOT CHANGE
         return successors
 
     def getCostOfActions(self, actions):
@@ -357,11 +416,31 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    corners = problem.corners  # These are the corner coordinates
+
+    # TODO set the needed values
+    cost = 0  # todo the cost is initial equal to 0
+    current = state[0]
+    # TODO prepare a list for unreached corners
+    cornersUnreached = list()
+    # todo get the reached corners form the state
+    cornersReached = state[1]
+
+    # todo set the unreached corner list
+    for corner in corners:
+        if corner not in cornersReached:
+            cornersUnreached.append(corner)
+
+    while len(cornersUnreached) > 0:  # todo if there are still unreached corners
+        hcost, corner = min({(util.manhattanDistance(current, corner), corner) for corner in cornersUnreached})
+        #     todo remove reached corner
+        cornersUnreached.remove(corner)
+        current = corner
+        cost += hcost
+
+    return 0
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
