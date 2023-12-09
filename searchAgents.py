@@ -542,7 +542,108 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    # abordare : folosim algoritmul lui Kruskal -MST
+
+    # TODO set the needed vars
+    # the state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
+    #     (see game.py) of either True or False. You can call foodGrid.asList() to get
+    #     a list of food coordinates instead.
+    foodNodesUnreached = foodGrid.asList()
+    if not foodNodesUnreached:
+        return 0
+    # MST variables
+    maze = []
+    edge = 0
+    index =0
+    parents={}
+    ranks={}
+    treeLenght = 0
+    nextFood = []
+
+    # TODO set graph
+    for i in range(len(foodNodesUnreached)):
+        for j in range(1, len(foodNodesUnreached)):
+            maze.append([foodNodesUnreached[i], foodNodesUnreached[j], util.manhattanDistance(foodNodesUnreached[i], foodNodesUnreached[j])])
+
+
+
+    # todo IMPLEMENT FIND SET function that finds the root of a set
+    # FIND-SET (X)
+    # 1 if xx.p
+    # 2 x.p FIND-SET(x.p)
+    # 3 return.x.p
+    def findSet(prnt, i):
+        if prnt[i]:
+            return findSet(prnt, prnt[i])
+        return i
+
+        # todo implement Link
+
+        # LINK (x, y)
+        # 1 if x.rank> y.rank
+        # 2 y.px
+        # 3 else .x.py
+        # 4 if x.rank == y.rank
+        # 5 x.ranky.rank +1
+
+    def link(x, y, rank, parent):
+        if rank[x] < rank[y]:
+            parent[x] = y
+        else:
+            parent[y] = x
+            if rank[x] == rank[y]:
+                rank[x] += 1
+
+    # TODO implement Union - function that performs the union operation to merge two sets
+    # UNION(x, y)
+    # 1 LINK (FIND-SET(X), FIND-SET(y))
+    def union(x,y,rank, parent):
+        xroot = findSet(parent, x)
+        yroot = findSet(parent, y)
+        link( xroot, yroot, rank,parent)
+
+
+    # TODO implemet KRUSKAL
+    def kruskal(foodNodesUnreached, maze, parents, ranks, index, edge, treeLenght, nextFood):
+        # MST-KRUSKAL (G,w)
+        # A=a
+        # 2 for each vertex v\in G.V
+        # 3 MAKE-SET (V)
+        for node in foodNodesUnreached:
+            ranks[node] = 0
+            parents[node] = None
+        # 4 sort the edges of G.E into nondecreasing order by weight w
+        maze = sorted(maze, key=lambda x: x[2])
+        # 5 for each edge (u,v) ∈ G.E, taken in nondecreasing order by weight
+        # 6 if FIND-SET (u) FIND-SET(v)
+        # 7 A-A\cup\{(u,v)\}
+        # 8 UNION (U, V)
+        # 9 return A
+        while edge < len(foodNodesUnreached) -1:
+            nodeU,nodeV, cost = maze[index]
+            x= findSet(parents, nodeU)
+            y= findSet(parents, nodeV)
+            if x != y:
+                edge += 1
+                treeLenght += cost
+                union(x,y,ranks, parents)
+            index+=1
+
+        # get the closest food node
+        for node in foodNodesUnreached:
+            cost = util.manhattanDistance(position,node)
+            nextFood.append(cost)
+        nextFood = min(nextFood)
+
+        result = treeLenght +nextFood
+        return result
+
+    result = kruskal(foodNodesUnreached, maze, parents, ranks, index, edge, treeLenght, nextFood)
+    return result
+
+
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -573,7 +674,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.uniformCostSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
