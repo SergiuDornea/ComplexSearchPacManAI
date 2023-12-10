@@ -87,65 +87,102 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
 
+    # TODO !!! CHANGE THE QUEUE FROM THE BFS ALGO TO A STACK  - BFS IMPLEMENTED FIRST BECAUSE OF THE PSEUDOCODE IN BOOK :)
+    # function BREADTH-FIRST-SEARCH(problem) returns a solution node or failure
+    #   node ← NODE(problem.INITIAL) -
+    #   TODO defined the inital node
     initialNode = problem.getStartState()
-
+    #   if problem.IS-GOAL(node.STATE) then return node
+    #  TODO check if goal has been reached
     if problem.isGoalState(initialNode):
-        return [] 
-
-    # frontiera este o stiva
-    stack = util.Stack() 
+        return []  # no actions needed if we start at the goal
+    #   frontier ← a FIFO stack
+    #   TODO create stack
+    stack = util.Stack()  # create the stack using the provided utils
+    #   with node as an element
+    #   TODO add the node to the list  with an empty list for directions as an object
     stack.push((initialNode, []))
-
-    # creem o lista cu nodurile deja parcurse
+    #   reached ← {problem.INITIAL}
+    #   TODO create a list to hold the values of reached nodes
     reachedNodes = []
-
-    # parcurgem frontiera in ordine LIFO
+    #   while not IS-EMPTY(frontier ) do
     while not stack.isEmpty():
-
+        #       node ← POP(frontier )
+        # TODO dequeue a nod (and list of directions) form the stack
         node, directionList = stack.pop()
-        if problem.isGoalState(node):
-            return directionList
-
+        #       TODO check if node has been reached , if not add it to reachedNodes
         if node not in reachedNodes:
             reachedNodes.append(node)
-
+            #           TODO check for exit condition - is goal state true?
+            if problem.isGoalState(node):
+                return directionList
+            #
+            #       for each child in EXPAND(problem, node) do
+            #           s ← child.STATE
+            #           if problem.IS-GOAL(s) then return child
+            #           if s is not in reached then
+            #               add s to reached
+            #               add child to frontier
+            #             TODO iterate over the succesors of current node
             succesorsList = problem.getSuccessors(node)
             for succesor, direction, stepCost in succesorsList:
+                #               TODO append the curr direction to directionList and
+                #                create newDirectionList
+                #                (holds the seauence of directions from initial state to current succesor)
                 newDirection = directionList + [direction]
+                #                 TODO enqueue the succesor node with newDirectionList to stack
                 stack.push((succesor, newDirection))
-
-    return []
-
+    #  return failure
+    util.raiseNotDefined()
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
 
+    # function BREADTH-FIRST-SEARCH(problem) returns a solution node or failure
+    #   node ← NODE(problem.INITIAL) -
+    #   TODO defined the inital node
     initialNode = problem.getStartState()
+    #   if problem.IS-GOAL(node.STATE) then return node
+    #  TODO check if goal has been reached
     if problem.isGoalState(initialNode):
-        return [] 
-    
-    # frontiera este o coada
-    queue = util.Queue() 
+        return []  # no actions needed if we start at the goal
+    #   frontier ← a FIFO queue
+    #   TODO create queue
+    queue = util.Queue()  # create the queue using the provided utils
+    #   with node as an element
+    #   TODO add the node to the list  with an empty list for directions as an object
     queue.push((initialNode, []))
-
-    # creem o lista cu nodurile deja parcurse
+    #   reached ← {problem.INITIAL}
+    #   TODO create a list to hold the values of reached nodes
     reachedNodes = []
-
-    # parcurgem frontiera in ordine FIFO
+    #   while not IS-EMPTY(frontier ) do
     while not queue.isEmpty():
-
+        #       node ← POP(frontier )
+        # TODO dequeue a nod (and list of directions) form the queue
         node, directionList = queue.pop()
-        if problem.isGoalState(node):
-            return directionList
-
+        #       TODO check if node has been reached , if not add it to reachedNodes
         if node not in reachedNodes:
             reachedNodes.append(node)
-
+            #           TODO check for exit condition - is goal state true?
+            if problem.isGoalState(node):
+                return directionList
+            #
+            #       for each child in EXPAND(problem, node) do
+            #           s ← child.STATE
+            #           if problem.IS-GOAL(s) then return child
+            #           if s is not in reached then
+            #               add s to reached
+            #               add child to frontier
+            #             TODO iterate over the succesors of current node
             succesorsList = problem.getSuccessors(node)
             for succesor, direction, stepCost in succesorsList:
+                #               TODO append the curr direction to directionList and
+                #                create newDirectionList
+                #                (holds the seauence of directions from initial state to current succesor)
                 newDirection = directionList + [direction]
+                #                 TODO enqueue the succesor node with newDirectionList to queue
                 queue.push((succesor, newDirection))
-
-    return []
+    #  return failure
+    util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
@@ -195,39 +232,58 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "* YOUR CODE HERE *"
 
+    """function GRAPH-SEARCH(problema, frontiera) :returneaza o solutie sau esec
+           closed ← o multime goala
+           frontiera ← INSERT(MAKE-NODE(INITIAL-STATE(problema)), frontiera)
+           loop
+               if frontiera este goala then
+                   return esec
+               end if
+               node ← REMOVE-FRONT(frontiera)
+               if GOAL-TEST(problema, STATE(node)) then
+                   return node
+               end if
+               if STATE(node) nu este in closed then
+                   add STATE(node) la closed
+                   for child-node in EXPAND(STATE(node), problem) do
+                   frontiera ← INSERT(child-node, frontiera)
+                   end for
+               end if
+           end loop
+       end function"""
+    # TODO start node
     start = problem.getStartState()
-
-    # frontiera este o coada de prioritati
-    priorityQueue = util.PriorityQueue()
-    priorityQueue.push((start,[],0), 0)
-
-    # creem o lista cu nodurile deja parcurse
+    # TODO  set reached node list
     reachedNodes = []
-
+    # TODO set queue
+    priorityQueue = util.PriorityQueue()
+    # todo add start node to queue
+    priorityQueue.push((start, [], 0), 0)
+    # TODO check if start node is not the goal
     if problem.isGoalState(start):
         return []
 
     while not priorityQueue.isEmpty():
-
+        #     TODO get the node, cost and directions form queue
         node, directions, currCost = priorityQueue.pop()
-        if problem.isGoalState(node):
-            return directions
-
         if node not in reachedNodes:
-
+            #     todo add the node to the reached list
+            reachedNodes.append(node)
+            #     TODO check if exit condition is valid - goal found
+            if problem.isGoalState(node):
+                return directions
             successors = problem.getSuccessors(node)
             for successor, action, stepCost in successors:
-                newCost = currCost + stepCost  
-                # calculeaza f(n)
-                heuristicCost = heuristic(successor, problem) + newCost 
-                newDirection = directions + [action] 
+                newCost = currCost + stepCost  # increase the cost with current step cost
+                heuristicCost = heuristic(successor,
+                                          problem) + newCost  # calculate the f(n) by adding new cost to the result of heuristic
+                newDirection = directions + [action]  # add the direction to directions
+                #             add to the pryority queue item with new priority (newCost)
+                priorityQueue.push((successor, newDirection, newCost),
+                                   heuristicCost)  # instead of setting the priority as the cost (like in UCS) set the priority according to the heuristic cost
 
-                # coada de prioritati returneaza nodurile ordonate dupa heuristica f(n)
-                priorityQueue.push((successor, newDirection, newCost), heuristicCost) 
+    util.raiseNotDefined()
 
-        reachedNodes.append(node)
-
-    return []
 
 # Abbreviations
 bfs = breadthFirstSearch

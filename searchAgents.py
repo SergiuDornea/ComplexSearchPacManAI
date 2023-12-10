@@ -416,7 +416,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***"  #TODO SA  TE PRINZI UNDE AI GRESIT 😊
     corners = problem.corners  # These are the corner coordinates
 
     # TODO set the needed values
@@ -710,6 +710,11 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
+        food = self.food.asList()
+        if state in food:
+            return True
+        else:
+            return False
         util.raiseNotDefined()
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
